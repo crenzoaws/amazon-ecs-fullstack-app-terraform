@@ -7,7 +7,6 @@
 
 # ------- Providers -------
 provider "aws" {
-  profile = var.aws_profile
   region  = var.aws_region
 
   # provider level tags - yet inconsistent when executing 
@@ -262,7 +261,7 @@ module "ecs_autoscaling_client" {
 
 # ------- Creating Bucket to store CodePipeline artifacts -------
 module "s3_codepipeline" {
-  source      = "./Modules/S3"
+  source      = "./Modules/S3/Bucket"
   bucket_name = "codepipeline-${var.aws_region}-${random_id.RANDOM_ID.hex}"
 }
 
@@ -358,30 +357,43 @@ module "codedeploy_client" {
   codedeploy_role = module.codedeploy_role.arn_role_codedeploy
 }
 
+module "codecommit_client" {
+  source          = "./Modules/CodeCommit"
+  source_repo_name = var.source_repo_name
+  source_repo_branch = var.source_repo_branch
+}
+
 # ------- Creating CodePipeline -------
 module "codepipeline" {
   source                   = "./Modules/CodePipeline"
   name                     = "pipeline-${var.environment_name}"
   pipe_role                = module.devops_role.arn_role
   s3_bucket                = module.s3_codepipeline.s3_bucket_id
-  github_token             = var.github_token
-  repo_owner               = var.repository_owner
-  repo_name                = var.repository_name
-  branch                   = var.repository_branch
   codebuild_project_server = module.codebuild_server.project_id
   codebuild_project_client = module.codebuild_client.project_id
   app_name_server          = module.codedeploy_server.application_name
   app_name_client          = module.codedeploy_client.application_name
   deployment_group_server  = module.codedeploy_server.deployment_group_name
   deployment_group_client  = module.codedeploy_client.deployment_group_name
-
-  depends_on = [module.policy_devops_role]
+  source_bucket_name         = module.s3_codepipeline_source.s3_bucket_id
+  depends_on = [module.policy_devops_role, module.s3_file_upload]
 }
 
 # ------- Creating Bucket to store assets accessed by the Back-end -------
 module "s3_assets" {
-  source      = "./Modules/S3"
+  source      = "./Modules/S3/Bucket"
   bucket_name = "assets-${var.aws_region}-${random_id.RANDOM_ID.hex}"
+}
+
+# ------- Creating Bucket to store codepipeline source code -------
+module "s3_codepipeline_source" {
+  source      = "./Modules/S3/Bucket"
+  bucket_name = "codepipeline-source-${var.aws_region}-${random_id.RANDOM_ID.hex}"
+}
+
+module "s3_file_upload" {
+  source      = "./Modules/S3/FileUpload"
+  destination_bucket = module.s3_codepipeline_source.s3_bucket_id
 }
 
 # ------- Creating Dynamodb table by the Back-end -------

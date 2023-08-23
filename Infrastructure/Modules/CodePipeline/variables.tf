@@ -16,27 +16,6 @@ variable "s3_bucket" {
   type        = string
 }
 
-variable "github_token" {
-  description = "Personal access token from Github"
-  type        = string
-  sensitive   = true
-}
-
-variable "repo_owner" {
-  description = "The username of the Github repository owner"
-  type        = string
-}
-
-variable "repo_name" {
-  description = "Github repository's name"
-  type        = string
-}
-
-variable "branch" {
-  description = "Github branch used to trigger the CodePipeline"
-  type        = string
-}
-
 variable "codebuild_project_server" {
   description = "Server's CodeBuild project name"
   type        = string
@@ -66,3 +45,9 @@ variable "deployment_group_client" {
   description = "CodeDeploy deployment group name for the client"
   type        = string
 }
+
+variable "source_bucket_name" {
+  description = "Source bucket name"
+  type        = string
+}
+
