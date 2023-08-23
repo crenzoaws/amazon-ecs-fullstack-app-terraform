@@ -166,6 +166,7 @@ module "ecs_taks_definition_server" {
   docker_repo        = module.ecr_server.ecr_repository_url
   region             = var.aws_region
   container_port     = var.port_app_server
+  example_parm_arn      = module.example_param.example_parm_arn
 }
 
 # ------- Creating ECS Task Definition for the client -------
@@ -180,6 +181,7 @@ module "ecs_taks_definition_client" {
   docker_repo        = module.ecr_client.ecr_repository_url
   region             = var.aws_region
   container_port     = var.port_app_client
+  example_parm_arn      = module.example_param.example_parm_arn
 }
 
 # ------- Creating a server Security Group for ECS TASKS -------
@@ -400,4 +402,10 @@ module "s3_file_upload" {
 module "dynamodb_table" {
   source = "./Modules/Dynamodb"
   name   = "assets-table-${var.environment_name}"
+}
+
+# ------- Creating Dynamodb table by the Back-end -------
+module "example_param" {
+  source = "./Modules/SystemsManager"
+  example_param_value   = "bar"
 }

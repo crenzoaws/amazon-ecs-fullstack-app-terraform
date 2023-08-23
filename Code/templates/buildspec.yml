@@ -32,7 +32,7 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPO_URL:$IMAGE_TAG
       - echo Changing directory to Templates directory
-      - cd ./Infrastructure/Templates
+      - cd ./templates
       - echo Preparing spec files in new folder
       - mkdir Artifacts
       - cp appspec.yaml Artifacts/appspec.yaml && cp taskdef.json Artifacts/taskdef.json
@@ -51,5 +51,5 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: 'Infrastructure/Templates/Artifacts'
+  base-directory: 'templates/Artifacts'
   discard-paths: yes

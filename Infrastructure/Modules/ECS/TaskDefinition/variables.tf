@@ -46,3 +46,11 @@ variable "container_port" {
   description = "The port that the container will use to listen to requests"
   type        = number
 }
+
+variable "example_parm_arn" {
+  description = "Paramater Store ARN for Example Value"
+  type        = string
+}
+
+
+

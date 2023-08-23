@@ -30,6 +30,10 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
         "image": "${var.docker_repo}",
         "name": "${var.container_name}",
         "networkMode": "awsvpc",
+        "secrets": [{
+          "name": "example_value",
+          "valueFrom": "${var.example_parm_arn}"
+        }],
         "portMappings": [
           {
             "containerPort": ${var.container_port},
