@@ -17,20 +17,18 @@ resource "aws_codepipeline" "aws_codepipeline" {
   stage {
     name = "Source"
 
-    action {
+   action {
       name             = "Source"
       category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
+      owner            = "AWS"
+      provider         = "S3"
       version          = "1"
-      output_artifacts = ["SourceArtifact"]
+      output_artifacts = ["source_output"]
 
       configuration = {
-        OAuthToken           = var.github_token
-        Owner                = var.repo_owner
-        Repo                 = var.repo_name
-        Branch               = var.branch
-        PollForSourceChanges = true
+        S3Bucket    = var.source_bucket_name
+        S3ObjectKey = "source.zip"
+        PollForSourceChanges = false
       }
     }
   }
@@ -44,7 +42,7 @@ resource "aws_codepipeline" "aws_codepipeline" {
       owner            = "AWS"
       provider         = "CodeBuild"
       version          = "1"
-      input_artifacts  = ["SourceArtifact"]
+      input_artifacts  = ["source_output"]
       output_artifacts = ["BuildArtifact_server"]
 
       configuration = {
@@ -58,7 +56,7 @@ resource "aws_codepipeline" "aws_codepipeline" {
       owner            = "AWS"
       provider         = "CodeBuild"
       version          = "1"
-      input_artifacts  = ["SourceArtifact"]
+      input_artifacts  = ["source_output"]
       output_artifacts = ["BuildArtifact_client"]
       configuration = {
         ProjectName = var.codebuild_project_client
